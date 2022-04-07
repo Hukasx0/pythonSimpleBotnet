@@ -28,7 +28,7 @@ def accept_cons():
    while True:
       try:
          conn, addr = sock.accept()
-         conn.setblocking(0)
+         conn.setblocking(1)
          cons_g.append(conn)
          addr_g.append(addr)
          print("\n"+addr[0]+" connected")
@@ -228,7 +228,10 @@ def main_shell():
             print("multiexec a/s")
       elif ans[0] == "con":
          if len(ans) > 1:
-            shell(int(ans[1]))
+            try:
+               shell(int(ans[1]))
+            except:
+                print("Looks like connection with this id does not exist")
          else:
             print("connect [ID]")
       else:
